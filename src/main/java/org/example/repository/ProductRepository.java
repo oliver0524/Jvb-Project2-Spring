@@ -16,7 +16,6 @@ The second (Long) specifies the entity's primary key type.*/
 public interface ProductRepository extends JpaRepository <ProductInfo, Long> {
 
     /** This method handles the call to a db with sql - select a record with a given name from PRODUCTS. Needed for validations */
-    List<ProductInfo> getProductByName(String name);
-    @Query("from PRODUCTS where product_name=:name")
-    List<ProductInfo> getProductByName2(@Param("name") String name);
+    @Query("from ProductInfo p where p.name = :name")
+    List<ProductInfo> getProductByName(@Param("name") String name);
 }
