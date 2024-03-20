@@ -22,13 +22,13 @@ public class SellerController {
     }
 
     //endpoints for localhost:9002/Seller
-    @GetMapping("/Seller")
-    public ResponseEntity<Set<String>> getAllSellersEndpoint() {
-        Set<String> sellers = SellerService.getAllSellers();
+    @GetMapping("/seller")
+    public ResponseEntity<List<Seller>> getAllSellersEndpoint() {
+        List<Seller> sellers = SellerService.getAllSellers();
         return new ResponseEntity<>(sellers, HttpStatus.OK);
     }
 
-    @PostMapping("/Seller")
+    @PostMapping("/seller")
     public ResponseEntity<?> postSellerEndpoint(@RequestBody Seller s) throws SellerException {
         try {
             SellerService.addSeller(s);

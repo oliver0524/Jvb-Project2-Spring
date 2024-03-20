@@ -14,8 +14,8 @@ import java.util.Set;
 
 public interface SellerRepository extends JpaRepository<Seller, String> {
 
-        @Query("select s from Sellers s")  // JPQL query selecting Seller objects
-        Set<String> findAllSellers();
+        //@Query("select s.sellername from Sellers s")  // JPQL query selecting Seller objects
+        //Set<String> findAllSellers();
     }
 
 

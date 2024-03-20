@@ -52,8 +52,8 @@ public class ProductService {
     public void addProduct(ProductInfo p) throws ProductInfoException {
 
         if (inputValuesValidated(p)) {
-            this.productRepository.save(p);
             p.getId();                                  // get the newly created id
+            this.productRepository.save(p);
             Main.log.info("New Product added: " + p);
         }
         throw new ProductInfoException("Product is not added");
@@ -71,7 +71,7 @@ public class ProductService {
             } else if (productRepository.getProductByName(p.getName()) != null){
                 Main.log.warn("ADD: Product name is duplicate: " + p.getName());
                 throw new ProductInfoException("Product name already exists");
-           } /**else if (sellertDAO.getSellerByName(p.getSellername()) == null){
+           } /**else if (sellerRepository.getSellerByName(p.getSellername()) == null){
                 Main.log.warn("ADD: Non-existent seller name: " + p.getSellername());
                 throw new ProductInfoException("Seller does not exist in the Seller set");
         } */else {

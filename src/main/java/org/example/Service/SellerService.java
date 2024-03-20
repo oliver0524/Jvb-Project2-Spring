@@ -13,6 +13,7 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -38,8 +39,8 @@ public class SellerService {
         if (s.getSellername().isBlank()) {
             Main.log.warn("Seller name is missing: " + s.getSellername());
             throw new SellerException("Seller name cannot be blank");
-        } /*else if (sellerDAO.getSellerByName(s.getSellername()) != null) {
-            Main.log.warn("ADD: Seller name is duplicate: " + s.getSellername());
+        } /*else if (sellerRepository.getSellerByName(s.getSellername()) != null) {
+            Main.log.warn("Seller name is duplicate: " + s.getSellername());
             throw new SellerException("Seller name already exists ");
         }*/ else {
             sellerRepository.save(s);
@@ -47,8 +48,8 @@ public class SellerService {
     }
 
     /**  This method handles the 'view' action and displays all Seller objects from the Seller Set */
-    public Set<String> getAllSellers() {
-        Set<String> sellers = sellerRepository.findAllSellers();
+    public List<Seller> getAllSellers() {
+        List<Seller> sellers = sellerRepository.findAll();
         Main.log.info("Set of all Sellers in the collection: " + sellers);
         return sellers;
     }
