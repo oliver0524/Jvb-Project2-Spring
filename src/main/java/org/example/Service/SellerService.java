@@ -11,19 +11,11 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class SellerService {
 
-    /**Class SellerService handles the Main functionality for Sellers.
-     * Methods here have functionality for the following actions: add, view all*/
-    //Set<Seller> sellerSet;
-    //SellerDAO sellerDAO;
-    ProductRepository productRepository;
     SellerRepository sellerRepository;
 
     @Autowired
@@ -39,11 +31,16 @@ public class SellerService {
         if (s.getSellername().isBlank()) {
             Main.log.warn("Seller name is missing: " + s.getSellername());
             throw new SellerException("Seller name cannot be blank");
-        } /*else if (sellerRepository.getSellerByName(s.getSellername()) != null) {
-            Main.log.warn("Seller name is duplicate: " + s.getSellername());
-            throw new SellerException("Seller name already exists ");
-        }*/ else {
-            sellerRepository.save(s);
+        } else {
+            // Check for existing seller with the same name
+            Optional<Seller> existingSeller = Optional.ofNullable(sellerRepository.findBySellername(s.getSellername()));
+
+            if (existingSeller.isPresent()) {
+                Main.log.warn("Duplicate seller name: " + s.getSellername());
+                throw new SellerException("Seller with this name already exists");
+            } else {
+                sellerRepository.save(s);
+            }
         }
     }
 
@@ -53,17 +50,6 @@ public class SellerService {
         Main.log.info("Set of all Sellers in the collection: " + sellers);
         return sellers;
     }
-//
-//    /**  This method handles the 'view' action to retrieve a single seller by name */
-//    public String getSellerByName(String name) throws SellerException {
-//        Main.log.info("VIEW: Searching for a seller: " + name);
-//        String s = sellerDAO.getSellerByName(name);
-//        if (s == null) {
-//            throw new SellerException("No Seller found ");
-//        } else {
-//            return s;
-//        }
-//    }
 
 }
 

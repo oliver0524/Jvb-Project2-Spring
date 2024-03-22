@@ -13,16 +13,8 @@ import java.util.Set;
 
 
 public interface SellerRepository extends JpaRepository<Seller, String> {
+    Seller findBySellername(String sellername);
 
-        //@Query("select s.sellername from Sellers s")  // JPQL query selecting Seller objects
-        //Set<String> findAllSellers();
-    }
-
-
-//    public Set<String> findBySeller(String sellername) {
-//        //JPQL query (java persistence query language)
-//        @Query("from Sellers where sellername=:sellername")
-//        Set<String> findBySeller2(@Param("sellername") String sellername);
-//    }
-
-//}
+    @Query(value = "SELECT s FROM Seller s WHERE s.sellername = :sellername")
+    Seller searchBySellername(@Param("sellername") String sellername);
+}

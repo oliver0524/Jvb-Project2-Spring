@@ -1,24 +1,42 @@
-# This application is using javalin service to initiate a web server. 
-# The application is handling two models, Products and Sellers through http requests
+# This application is using Spring framework to initiate a web server. 
+# The application is handling two models, Products and Sellers through http Postman requests
+
+# Samples JSON requests
+- POST/GET Product (seller could be an existing or a new one): http://localhost:9002/product
+  {
+    "name": "galaxy22",
+    "price": 1500,
+    "sellername": {
+    "sellername": "Android"  // Seller name within the nested object
+    }
+- POST/GET Sellers: http://localhost:9002/seller
+  {
+  "sellername": "Android"
+  }
+  - UPDATE/DELETE Product: http://localhost:9002/product/2
+    {
+    "name": "iphone12",
+    "price": 100,
+    "sellername": {
+    "sellername": "Apple"
+    }
+    }
 
 # Product Model
 -  Product Model structure:
   * Product Product Id (Primary key) 
   * Product Name 
   * Price 
-  * Seller Name (foreign key to the Seller table)
+  * Seller Name
 
 -  Product Service requests:
   * GET all products
-  * GET by product-id (404 for a non-existed product)
-  * GET by a partial product name
-  * GET products by seller
   * POST product 
     * Add a single product
     * Product ids should be non-null and unique
     * Product names should be non-null
     * Price should be over 0
-    * Seller name should refer to an actually existing seller (referential integrity)
+    * Seller name (can be an existing or a new one)
   * PUT by product-id
     * Update a single product
     * Product names should be non-null
@@ -35,10 +53,7 @@
 - Seller Service requests:
     * GET all sellers
     * POST seller
-      * Selle name must be non-null & unique 
-    
-# JUnit
- - JUnit test can be executed by running the ProductServiceTest.java class
+      * Selle name must be non-null & unique
  
 
 # Logging

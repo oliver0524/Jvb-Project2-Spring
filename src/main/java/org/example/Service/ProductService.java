@@ -2,6 +2,7 @@ package org.example.Service;
 
 import org.example.Main;
 import org.example.Model.ProductInfo;
+import org.example.Model.Seller;
 import org.example.repository.ProductRepository;
 import org.example.repository.SellerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,23 +24,18 @@ public class ProductService {
 
     /** Dependency Injection */
     SellerService sellerService;
-   List<ProductInfo> ProductinfoList;
-   ProductRepository productRepository;
-   SellerRepository sellerRepository;
+    ProductRepository productRepository;
+    SellerRepository sellerRepository;
 
 
-   @Autowired
+    @Autowired
     public ProductService(
             SellerService sellerService, ProductRepository productRepository, SellerRepository sellerRepository){
         this.sellerService = sellerService;
-        //this.ProductinfoList = new ArrayList<>();
         this.productRepository = productRepository;
         this.sellerRepository = sellerRepository;
     }
 
-    //public List<ProductInfo> getProductinfo() {
-    //    return ProductinfoList;
-    //}
 
     /** This method handles the 'GET' action and displays all ProductInfo objects from the Productinfo list */
     public List<ProductInfo> getAllProducts(){
@@ -52,84 +48,94 @@ public class ProductService {
     public void addProduct(ProductInfo p) throws ProductInfoException {
 
         if (inputValuesValidated(p)) {
-            p.getId();                                  // get the newly created id
-            this.productRepository.save(p);
-            Main.log.info("New Product added: " + p);
+            // Add product either with an existing or a new seller
+                this.productRepository.save(p);
+                Main.log.info("New Product added: " + p);
+
+            } else {
+                throw new ProductInfoException("Product is not added");
+            }
         }
-        throw new ProductInfoException("Product is not added");
-    }
 
     /** Method to validate all input values based on requirements */
     public boolean inputValuesValidated(ProductInfo p) throws ProductInfoException {
-        if (p.getName().isBlank() || p.getSeller_name().getSellername().isBlank()){
-                Main.log.warn("ADD: Product or Seller name are missing: "
-                        + p.getName() + "| " + p.getSeller_name());
-                throw new ProductInfoException("Product name or Seller name cannot be blank");
-            } else if (p.getPrice() <= 0) {
-                Main.log.warn("ADD: Price is <= 0: " + p.getPrice());
-                throw new ProductInfoException("Product price should be greater than 0");
-            } else if (productRepository.getProductByName(p.getName()) != null){
-                Main.log.warn("ADD: Product name is duplicate: " + p.getName());
-                throw new ProductInfoException("Product name already exists");
-           } /**else if (sellerRepository.getSellerByName(p.getSellername()) == null){
-                Main.log.warn("ADD: Non-existent seller name: " + p.getSellername());
-                throw new ProductInfoException("Seller does not exist in the Seller set");
-        } */else {
-            return true;
-        }
+        // Check if the ProductInfo object itself is null
+        if (p == null) {
+            Main.log.warn("ADD: ProductInfo object is null");
+            throw new ProductInfoException("ProductInfo cannot be null");
+        } else
+
+            // Check if the product name is null, empty, or only whitespace
+            if (p.getName() == null || p.getName().isBlank()) {
+                Main.log.warn("ADD: Product name is missing");
+                throw new ProductInfoException("Product name cannot be blank");
+            } else
+
+                // Check if the seller_name is null before trying to access getSellername()
+                if (p.getSellername() == null || p.getSellername().getSellername() == null || p.getSellername().getSellername().isBlank()) {
+                    Main.log.warn("ADD: Seller name is missing for product: " + p.getName());
+                    throw new ProductInfoException("Seller name cannot be blank");
+                } else
+
+                    // Validate the product price
+                    if (p.getPrice() <= 0) {
+                        Main.log.warn("ADD: Price is <= 0 for product: " + p.getName());
+                        throw new ProductInfoException("Product price should be greater than 0");
+                    } else
+
+                        // Check if the product name already exists in the repository
+                        if (productRepository.getProductByName(p.getName()).size() > 0) {
+                            Main.log.warn("ADD: Product name is duplicate: " + p.getName());
+                            throw new ProductInfoException("Product name already exists");
+                        } else
+
+                            // Check if the sellername already exists; if not -> create anew Seller
+                            if (sellerRepository.findBySellername(p.getSellername().getSellername()) == null) {
+                                Seller newSeller = new Seller();
+                                newSeller.setSellername(p.getSellername().getSellername());
+                                sellerRepository.save(newSeller);
+                                // Set the seller for the product
+                                p.setSellername(newSeller);
+                                return true;
+                            } else {
+
+                                return true;
+                            }
     }
 
-//    /** This method handles the 'GET' by product_id. The product-id is obtained from a corresponding post request */
-//    public ProductInfo getProductById(Integer id) throws ProductInfoException {
-//        ProductInfo p = productDAO.getProductById(id);
-//        if (p == null) {
-//            throw new ProductInfoException("Product ID is not found");
-//        } else {
-//            return p;
-//        }
-//    }
-//
-//
-//    /** This method handles the 'GET' by partial product_name.  */
-//    public List<ProductInfo> getProductByPartialName(String name) throws ProductInfoException {
-//        List<ProductInfo> productList = productDAO.getProductByPartialName(name);
-//        if (productList.isEmpty()) {
-//            throw new ProductInfoException("No products found");
-//        } else {
-//            return productList;
-//        }
-//    }
-//
-//      /** This method handles the 'GET' action and displays all ProductInfo objects from the Productinfo list */
-//    public List<ProductInfo> getAllProducts(){
-//        List<ProductInfo> productList = productDAO.getAllProducts();
-//        Main.log.info("VIEW: List of all Products in the collection: "+ productList);
-//        return productList;
-//    }
-//
-//
-//    /** This method handles the 'DELETE' action by product-id. The product-id is obtained from a corresponding post request */
-//    public void deleteProductById(Integer id){
-//        ProductInfo p = productDAO.getProductById(id);
-//        if (p != null){
-//            if (productDAO.deleteProductById(id)) {
-//                Main.log.info("DELETE: Successful delete for Product: " + p);
-//            }
-//        }
-//    }
-//
-//    /** This method handles the 'PUT' action by product-id. The product-id is obtained from a corresponding post request  */
-//    public ProductInfo updateProductById(ProductInfo p) throws ProductInfoException {
-//        if ((productDAO.getProductById(p.getId()) != null) && inputValuesValidated(p)) {
-//            productDAO.updateProductById(p);
-//            Main.log.info("UPDATE: product is modified: " + p);
-//            return p;
-//        } else {
-//            throw new ProductInfoException("Product is not updated: " + p);
-//        }
-//        //return null;
-//    }
+    /**
+     * Deletes a product by its ID.
+     *
+     * @param productId The ID of the product to delete.
+     * @throws ProductInfoException if the product does not exist.
+     */
+    public void deleteProduct(Long productId) throws ProductInfoException {
+        // Check if the product exists
+        if (!productRepository.existsById(productId)) {
+            Main.log.warn("DELETE: Product with ID " + productId + " does not exist.");
+            throw new ProductInfoException("Product with ID " + productId + " does not exist.");
+        }
 
+        // If it exists, delete the product
+        productRepository.deleteById(productId);
+        Main.log.info("DELETE: Product with ID " + productId + " has been deleted.");
+    }
+
+    public void updateProduct(ProductInfo updatedProduct) throws ProductInfoException {
+        // Validate input
+        if (!inputValuesValidated(updatedProduct)) {
+            throw new ProductInfoException("Validation failed for the product.");
+        }
+
+        // Check if the product exists
+        if (!productRepository.existsById(updatedProduct.getId())) {
+            throw new ProductInfoException("Product with ID " + updatedProduct.getId() + " does not exist.");
+        }
+
+        // Perform the update
+        productRepository.save(updatedProduct);
+        Main.log.info("UPDATE: Product updated: " + updatedProduct);
+    }
 
 }
 
